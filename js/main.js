@@ -19,6 +19,22 @@
   window.addEventListener('scroll', onScroll, { passive: true });
 
   /* ------------------------------------------------------------------
+     Logo lightbox
+     ------------------------------------------------------------------ */
+  var headerLogo = document.getElementById('headerLogo');
+  var logoLightbox = document.getElementById('logoLightbox');
+
+  headerLogo.addEventListener('click', function (e) {
+    e.preventDefault();
+    logoLightbox.classList.add('active');
+    logoLightbox.setAttribute('aria-hidden', 'false');
+  });
+  logoLightbox.addEventListener('click', function () {
+    logoLightbox.classList.remove('active');
+    logoLightbox.setAttribute('aria-hidden', 'true');
+  });
+
+  /* ------------------------------------------------------------------
      Mobile nav toggle
      ------------------------------------------------------------------ */
   var toggle = document.getElementById('menuToggle');
