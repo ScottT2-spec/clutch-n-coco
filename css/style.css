@@ -422,20 +422,6 @@ strong { font-weight:600; }
 }
 @media(max-width:480px){ .brand-logo { height:40px; } }
 
-/* Logo lightbox */
-.logo-lightbox {
-  position:fixed; inset:0; z-index:300;
-  background:rgba(58,26,26,.7); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px);
-  display:flex; align-items:center; justify-content:center;
-  opacity:0; pointer-events:none; transition:opacity .3s var(--ease); cursor:pointer;
-}
-.logo-lightbox.active { opacity:1; pointer-events:auto; }
-.logo-lightbox img {
-  max-width:85vw; max-height:80vh; border-radius:var(--r);
-  box-shadow:var(--sh-lg); transform:scale(.9); transition:transform .3s var(--ease);
-}
-.logo-lightbox.active img { transform:scale(1); }
-
 /* Stylised C in hero title */
 .swoosh-c {
   font-family:'Great Vibes', cursive;
