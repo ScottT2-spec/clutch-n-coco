@@ -412,3 +412,105 @@ strong { font-weight:600; }
   .grid--4 { grid-template-columns:1fr; max-width:320px; margin:0 auto; }
   .value-grid { grid-template-columns:1fr; }
 }
+
+/* ---------------------------------------------------------------------------
+   Clickable category cards
+   --------------------------------------------------------------------------- */
+.product-card--clickable { cursor:pointer; transition:transform var(--dur) var(--ease), box-shadow var(--dur) var(--ease); }
+.product-card--clickable:hover,
+.product-card--clickable:focus-visible { transform:translateY(-4px); box-shadow:var(--sh-lg); }
+.card-tap-hint {
+  display:block; margin-top:8px; font-size:.78rem; color:var(--rose);
+  font-weight:500; opacity:.7; transition:opacity .2s;
+}
+.product-card--clickable:hover .card-tap-hint { opacity:1; }
+
+/* ---------------------------------------------------------------------------
+   Product modal overlay
+   --------------------------------------------------------------------------- */
+.modal-overlay {
+  position:fixed; inset:0; z-index:200;
+  background:rgba(58,26,26,.55); backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px);
+  display:flex; align-items:center; justify-content:center;
+  opacity:0; pointer-events:none; transition:opacity .3s var(--ease);
+}
+.modal-overlay.active { opacity:1; pointer-events:auto; }
+
+.modal-content {
+  background:var(--white); border-radius:var(--r); width:92%; max-width:680px;
+  max-height:85vh; display:flex; flex-direction:column;
+  box-shadow:var(--sh-lg); transform:translateY(24px) scale(.97);
+  transition:transform .3s var(--ease);
+}
+.modal-overlay.active .modal-content { transform:translateY(0) scale(1); }
+
+.modal-header {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:20px 24px; border-bottom:1px solid var(--blush);
+}
+.modal-title {
+  font-family:'Playfair Display',Georgia,serif;
+  font-size:1.35rem; font-weight:700; color:var(--burgundy);
+}
+.modal-close {
+  background:none; border:none; font-size:1.8rem; color:var(--txt-mid);
+  cursor:pointer; line-height:1; padding:4px 8px; border-radius:8px;
+  transition:background .2s, color .2s;
+}
+.modal-close:hover { background:var(--blush); color:var(--burgundy); }
+
+.modal-body { padding:20px 24px; overflow-y:auto; flex:1; }
+
+.modal-footer {
+  padding:16px 24px; border-top:1px solid var(--blush);
+  text-align:center;
+}
+
+/* Product items inside modal */
+.item-grid {
+  display:grid; grid-template-columns:repeat(auto-fill, minmax(180px, 1fr));
+  gap:16px;
+}
+.item-card {
+  background:var(--blush-light); border-radius:var(--r-sm);
+  overflow:hidden; transition:box-shadow .2s var(--ease);
+}
+.item-card:hover { box-shadow:var(--sh-md); }
+
+.item-image {
+  width:100%; aspect-ratio:1/1; object-fit:cover;
+  background:var(--blush); display:flex; align-items:center; justify-content:center;
+}
+.item-image-placeholder {
+  width:100%; aspect-ratio:1/1; display:flex; align-items:center; justify-content:center;
+  background:linear-gradient(135deg, var(--blush) 0%, var(--blush-light) 100%);
+  font-size:3rem;
+}
+
+.item-info { padding:12px 14px; }
+.item-name {
+  font-family:'Playfair Display',Georgia,serif;
+  font-size:.95rem; font-weight:600; color:var(--burgundy-dark); margin-bottom:4px;
+}
+.item-desc { font-size:.8rem; color:var(--txt-mid); margin-bottom:8px; line-height:1.4; }
+.item-meta { display:flex; align-items:center; justify-content:space-between; gap:8px; flex-wrap:wrap; }
+.item-price { font-weight:600; color:var(--burgundy); font-size:.9rem; }
+.item-status {
+  font-size:.7rem; font-weight:600; text-transform:uppercase; letter-spacing:.04em;
+  padding:3px 8px; border-radius:var(--r-pill);
+}
+.item-status--available { background:#d4edda; color:#155724; }
+.item-status--preorder { background:#fff3cd; color:#856404; }
+
+.modal-empty {
+  text-align:center; padding:40px 20px; color:var(--txt-mid);
+}
+.modal-empty-emoji { font-size:3rem; margin-bottom:12px; }
+.modal-empty p { font-size:.95rem; }
+
+@media(max-width:480px){
+  .item-grid { grid-template-columns:1fr 1fr; gap:12px; }
+  .modal-content { width:96%; max-height:90vh; }
+  .modal-header { padding:16px 18px; }
+  .modal-body { padding:16px 18px; }
+}

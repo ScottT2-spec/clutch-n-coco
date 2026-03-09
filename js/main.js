@@ -68,4 +68,110 @@
     });
   }
 
+  /* ------------------------------------------------------------------
+     Product catalog & modal
+     ------------------------------------------------------------------ */
+  var products = [];
+  var modal = document.getElementById('productModal');
+  var modalTitle = document.getElementById('modalTitle');
+  var modalBody = document.getElementById('modalBody');
+  var modalClose = document.getElementById('modalClose');
+
+  // Category display names & emoji
+  var categoryMeta = {
+    'dresses-tops':      { name: 'Dresses & Tops',      emoji: '👗' },
+    'jewelry-bracelets': { name: 'Jewelry & Bracelets',  emoji: '💍' },
+    'perfumes':          { name: 'Perfumes',              emoji: '🧴' },
+    'hair-bonnets':      { name: 'Hair & Bonnets',        emoji: '🎀' },
+    'shoes':             { name: 'Shoes',                  emoji: '👠' },
+    'gift-sets':         { name: 'Gift Sets',              emoji: '🎁' },
+    'watches-wallets':   { name: 'Watches & Wallets',      emoji: '⌚' },
+    'chains-earrings':   { name: 'Chains & Earrings',      emoji: '🔗' }
+  };
+
+  // Load products.json
+  fetch('products.json')
+    .then(function (res) { return res.json(); })
+    .then(function (data) { products = data; })
+    .catch(function () { products = []; });
+
+  // Open modal for a category
+  function openModal(category) {
+    var meta = categoryMeta[category] || { name: category, emoji: '🛍️' };
+    modalTitle.textContent = meta.emoji + ' ' + meta.name;
+
+    var items = products.filter(function (p) { return p.category === category; });
+
+    if (items.length === 0) {
+      modalBody.innerHTML =
+        '<div class="modal-empty">' +
+          '<div class="modal-empty-emoji">🛍️</div>' +
+          '<p>Items coming soon!<br>Message us on WhatsApp for the latest stock.</p>' +
+        '</div>';
+    } else {
+      var html = '<div class="item-grid">';
+      items.forEach(function (item) {
+        var statusClass = item.status === 'available' ? 'item-status--available' : 'item-status--preorder';
+        var statusLabel = item.status === 'available' ? 'Available' : 'Preorder';
+
+        var imageHtml;
+        if (item.image) {
+          imageHtml = '<img class="item-image" src="' + item.image + '" alt="' + item.name + '" loading="lazy">';
+        } else {
+          imageHtml = '<div class="item-image-placeholder">' + meta.emoji + '</div>';
+        }
+
+        html +=
+          '<div class="item-card">' +
+            imageHtml +
+            '<div class="item-info">' +
+              '<div class="item-name">' + item.name + '</div>' +
+              '<div class="item-desc">' + (item.description || '') + '</div>' +
+              '<div class="item-meta">' +
+                '<span class="item-price">' + item.price + '</span>' +
+                '<span class="item-status ' + statusClass + '">' + statusLabel + '</span>' +
+              '</div>' +
+            '</div>' +
+          '</div>';
+      });
+      html += '</div>';
+      modalBody.innerHTML = html;
+    }
+
+    modal.classList.add('active');
+    modal.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+    modalClose.focus();
+  }
+
+  function closeModal() {
+    modal.classList.remove('active');
+    modal.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+  }
+
+  // Category card clicks
+  document.querySelectorAll('.product-card--clickable').forEach(function (card) {
+    card.addEventListener('click', function () {
+      var cat = card.getAttribute('data-category');
+      if (cat) openModal(cat);
+    });
+    card.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        var cat = card.getAttribute('data-category');
+        if (cat) openModal(cat);
+      }
+    });
+  });
+
+  // Close modal
+  modalClose.addEventListener('click', closeModal);
+  modal.addEventListener('click', function (e) {
+    if (e.target === modal) closeModal();
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && modal.classList.contains('active')) closeModal();
+  });
+
 })();

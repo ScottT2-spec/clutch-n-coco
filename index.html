@@ -128,7 +128,7 @@
 
       <div class="grid grid--4">
         <!-- Women's -->
-        <article class="product-card">
+        <article class="product-card product-card--clickable" data-category="dresses-tops" role="button" tabindex="0">
           <div class="product-visual" style="--card-hue: 350;">
             <span class="product-emoji" aria-hidden="true">👗</span>
           </div>
@@ -136,10 +136,11 @@
             <h3>Dresses &amp; Tops</h3>
             <p>Trendy pieces for every occasion.</p>
             <span class="stock-tag stock-tag--preorder">Preorder · ~2 wks</span>
+            <span class="card-tap-hint">Tap to view items →</span>
           </div>
         </article>
 
-        <article class="product-card">
+        <article class="product-card product-card--clickable" data-category="jewelry-bracelets" role="button" tabindex="0">
           <div class="product-visual" style="--card-hue: 330;">
             <span class="product-emoji" aria-hidden="true">💍</span>
           </div>
@@ -147,10 +148,11 @@
             <h3>Jewelry &amp; Bracelets</h3>
             <p>Elegant finishing touches for any outfit.</p>
             <span class="stock-tag stock-tag--available">Available Now</span>
+            <span class="card-tap-hint">Tap to view items →</span>
           </div>
         </article>
 
-        <article class="product-card">
+        <article class="product-card product-card--clickable" data-category="perfumes" role="button" tabindex="0">
           <div class="product-visual" style="--card-hue: 25;">
             <span class="product-emoji" aria-hidden="true">🧴</span>
           </div>
@@ -158,10 +160,11 @@
             <h3>Perfumes</h3>
             <p>Signature scents at wallet-friendly prices.</p>
             <span class="stock-tag stock-tag--preorder">Preorder · ~2 wks</span>
+            <span class="card-tap-hint">Tap to view items →</span>
           </div>
         </article>
 
-        <article class="product-card">
+        <article class="product-card product-card--clickable" data-category="hair-bonnets" role="button" tabindex="0">
           <div class="product-visual" style="--card-hue: 345;">
             <span class="product-emoji" aria-hidden="true">🎀</span>
           </div>
@@ -169,10 +172,11 @@
             <h3>Hair &amp; Bonnets</h3>
             <p>Customised bonnets and hair essentials.</p>
             <span class="stock-tag stock-tag--available">Available Now</span>
+            <span class="card-tap-hint">Tap to view items →</span>
           </div>
         </article>
 
-        <article class="product-card">
+        <article class="product-card product-card--clickable" data-category="shoes" role="button" tabindex="0">
           <div class="product-visual" style="--card-hue: 340;">
             <span class="product-emoji" aria-hidden="true">👠</span>
           </div>
@@ -180,10 +184,11 @@
             <h3>Shoes</h3>
             <p>On-trend footwear for her.</p>
             <span class="stock-tag stock-tag--preorder">Preorder · ~2 wks</span>
+            <span class="card-tap-hint">Tap to view items →</span>
           </div>
         </article>
 
-        <article class="product-card">
+        <article class="product-card product-card--clickable" data-category="gift-sets" role="button" tabindex="0">
           <div class="product-visual" style="--card-hue: 10;">
             <span class="product-emoji" aria-hidden="true">🎁</span>
           </div>
@@ -191,11 +196,12 @@
             <h3>Gift Sets</h3>
             <p>Curated bundles for any special occasion.</p>
             <span class="stock-tag stock-tag--available">Available Now</span>
+            <span class="card-tap-hint">Tap to view items →</span>
           </div>
         </article>
 
         <!-- Men's -->
-        <article class="product-card">
+        <article class="product-card product-card--clickable" data-category="watches-wallets" role="button" tabindex="0">
           <div class="product-visual" style="--card-hue: 215;">
             <span class="product-emoji" aria-hidden="true">⌚</span>
           </div>
@@ -203,10 +209,11 @@
             <h3>Watches &amp; Wallets</h3>
             <p>Sharp accessories for the gents.</p>
             <span class="stock-tag stock-tag--preorder">Preorder · ~2 wks</span>
+            <span class="card-tap-hint">Tap to view items →</span>
           </div>
         </article>
 
-        <article class="product-card">
+        <article class="product-card product-card--clickable" data-category="chains-earrings" role="button" tabindex="0">
           <div class="product-visual" style="--card-hue: 220;">
             <span class="product-emoji" aria-hidden="true">🔗</span>
           </div>
@@ -214,6 +221,7 @@
             <h3>Chains &amp; Earrings</h3>
             <p>Chains, magnetic earrings and more for him.</p>
             <span class="stock-tag stock-tag--available">Available Now</span>
+            <span class="card-tap-hint">Tap to view items →</span>
           </div>
         </article>
       </div>
@@ -300,6 +308,22 @@
       </div>
     </div>
   </section>
+
+  <!-- ============ PRODUCT MODAL ============ -->
+  <div class="modal-overlay" id="productModal" aria-hidden="true" role="dialog" aria-label="Product listing">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title" id="modalTitle">Products</h2>
+        <button class="modal-close" id="modalClose" aria-label="Close">&times;</button>
+      </div>
+      <div class="modal-body" id="modalBody">
+        <!-- Products injected by JS -->
+      </div>
+      <div class="modal-footer">
+        <a href="https://chat.whatsapp.com/JtiUxk5RX5o1pchydMfE6N" target="_blank" rel="noopener noreferrer" class="btn btn--solid">Order on WhatsApp 💬</a>
+      </div>
+    </div>
+  </div>
 
   <!-- ============ FOOTER ============ -->
   <footer class="site-footer" role="contentinfo">

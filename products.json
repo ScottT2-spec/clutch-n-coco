@@ -1,0 +1,173 @@
+[
+  {
+    "id": 1,
+    "name": "Floral Summer Dress",
+    "category": "dresses-tops",
+    "price": "GH₵ 85",
+    "status": "preorder",
+    "description": "Light, airy floral dress perfect for campus days.",
+    "image": ""
+  },
+  {
+    "id": 2,
+    "name": "Off-Shoulder Blouse",
+    "category": "dresses-tops",
+    "price": "GH₵ 60",
+    "status": "preorder",
+    "description": "Trendy off-shoulder top in multiple colours.",
+    "image": ""
+  },
+  {
+    "id": 3,
+    "name": "Bodycon Mini Dress",
+    "category": "dresses-tops",
+    "price": "GH₵ 95",
+    "status": "preorder",
+    "description": "Fitted mini dress for nights out.",
+    "image": ""
+  },
+  {
+    "id": 4,
+    "name": "Beaded Charm Bracelet",
+    "category": "jewelry-bracelets",
+    "price": "GH₵ 25",
+    "status": "available",
+    "description": "Handmade beaded bracelet with charm accents.",
+    "image": ""
+  },
+  {
+    "id": 5,
+    "name": "Gold Layered Necklace",
+    "category": "jewelry-bracelets",
+    "price": "GH₵ 40",
+    "status": "available",
+    "description": "Elegant layered chain necklace.",
+    "image": ""
+  },
+  {
+    "id": 6,
+    "name": "Pearl Stud Earrings",
+    "category": "jewelry-bracelets",
+    "price": "GH₵ 20",
+    "status": "available",
+    "description": "Classic pearl studs for everyday wear.",
+    "image": ""
+  },
+  {
+    "id": 7,
+    "name": "Designer Impression Perfume",
+    "category": "perfumes",
+    "price": "GH₵ 70",
+    "status": "preorder",
+    "description": "Long-lasting designer-inspired scent.",
+    "image": ""
+  },
+  {
+    "id": 8,
+    "name": "Body Mist Set (3-pack)",
+    "category": "perfumes",
+    "price": "GH₵ 55",
+    "status": "preorder",
+    "description": "Three fruity/floral body mists in a gift box.",
+    "image": ""
+  },
+  {
+    "id": 9,
+    "name": "Satin Bonnet — Custom Colour",
+    "category": "hair-bonnets",
+    "price": "GH₵ 30",
+    "status": "available",
+    "description": "Customised satin bonnet — pick your colour and size.",
+    "image": ""
+  },
+  {
+    "id": 10,
+    "name": "Silk Hair Scrunchies (5-pack)",
+    "category": "hair-bonnets",
+    "price": "GH₵ 20",
+    "status": "available",
+    "description": "Gentle silk scrunchies in assorted colours.",
+    "image": ""
+  },
+  {
+    "id": 11,
+    "name": "Claw Clip Set",
+    "category": "hair-bonnets",
+    "price": "GH₵ 15",
+    "status": "available",
+    "description": "Stylish claw clips in neutral tones.",
+    "image": ""
+  },
+  {
+    "id": 12,
+    "name": "Block Heel Sandals",
+    "category": "shoes",
+    "price": "GH₵ 110",
+    "status": "preorder",
+    "description": "Comfortable block heels in nude and black.",
+    "image": ""
+  },
+  {
+    "id": 13,
+    "name": "Platform Sneakers",
+    "category": "shoes",
+    "price": "GH₵ 95",
+    "status": "preorder",
+    "description": "Trendy platform sneakers for casual looks.",
+    "image": ""
+  },
+  {
+    "id": 14,
+    "name": "Pamper Her Gift Set",
+    "category": "gift-sets",
+    "price": "GH₵ 120",
+    "status": "available",
+    "description": "Bonnet, bracelet, body mist & card in a gift box.",
+    "image": ""
+  },
+  {
+    "id": 15,
+    "name": "Birthday Bundle",
+    "category": "gift-sets",
+    "price": "GH₵ 150",
+    "status": "available",
+    "description": "Premium curated bundle for birthdays.",
+    "image": ""
+  },
+  {
+    "id": 16,
+    "name": "Classic Leather Watch",
+    "category": "watches-wallets",
+    "price": "GH₵ 80",
+    "status": "preorder",
+    "description": "Minimalist leather-strap watch for men.",
+    "image": ""
+  },
+  {
+    "id": 17,
+    "name": "Slim Bifold Wallet",
+    "category": "watches-wallets",
+    "price": "GH₵ 45",
+    "status": "preorder",
+    "description": "Sleek faux-leather bifold wallet.",
+    "image": ""
+  },
+  {
+    "id": 18,
+    "name": "Cuban Link Chain",
+    "category": "chains-earrings",
+    "price": "GH₵ 50",
+    "status": "available",
+    "description": "Bold Cuban link chain in silver or gold tone.",
+    "image": ""
+  },
+  {
+    "id": 19,
+    "name": "Magnetic Stud Earrings",
+    "category": "chains-earrings",
+    "price": "GH₵ 15",
+    "status": "available",
+    "description": "No-pierce magnetic studs — easy on, easy off.",
+    "image": ""
+  }
+]
