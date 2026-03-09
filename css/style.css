@@ -418,9 +418,9 @@ strong { font-weight:600; }
    --------------------------------------------------------------------------- */
 /* Brand logo in header */
 .brand-logo {
-  height:44px; width:auto; display:block; border-radius:6px;
+  height:32px; width:auto; display:block; border-radius:4px;
 }
-@media(max-width:480px){ .brand-logo { height:36px; } }
+@media(max-width:480px){ .brand-logo { height:26px; } }
 
 /* Wide card for "Other Items" spanning full row */
 .product-card--wide { grid-column: 1 / -1; }
