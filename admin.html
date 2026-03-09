@@ -664,15 +664,11 @@
       saveProductBtn.disabled = true;
       saveProductBtn.textContent = 'Saving...';
 
-      // Upload image first if a new file was selected
+      // Compress and store image directly (no Firebase Storage needed)
       var imagePromise;
       if (selectedImageFile) {
-        saveProductBtn.textContent = 'Uploading image...';
-        imagePromise = uploadImage(selectedImageFile).catch(function (err) {
-          // Fallback: compress and store as base64 data URL in Firestore
-          saveProductBtn.textContent = 'Compressing image...';
-          return compressAndEncode(selectedImageFile);
-        });
+        saveProductBtn.textContent = 'Processing image...';
+        imagePromise = compressAndEncode(selectedImageFile);
       } else {
         imagePromise = Promise.resolve(existingImage);
       }
