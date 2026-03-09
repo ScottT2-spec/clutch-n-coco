@@ -225,6 +225,44 @@
         <div class="stat-card"><div class="stat-num" id="statCategories">0</div><div class="stat-label">Categories</div></div>
       </div>
 
+      <!-- Instructions -->
+      <div class="admin-instructions" id="adminInstructions">
+        <div class="instructions-header" id="instructionsToggle" style="cursor:pointer; display:flex; align-items:center; justify-content:space-between;">
+          <h2 style="font-family:'Playfair Display',Georgia,serif; font-size:1.1rem; color:var(--burgundy); margin:0;">📖 How to Use This Admin Panel</h2>
+          <span id="instructionsArrow" style="font-size:1.2rem; color:var(--burgundy); transition:transform .2s;">▼</span>
+        </div>
+        <div class="instructions-body" id="instructionsBody" style="display:none; margin-top:16px; background:var(--white); border-radius:var(--r-sm); padding:20px; box-shadow:var(--sh-sm); font-size:.9rem; color:var(--txt-mid); line-height:1.7;">
+          <p><strong>Adding a Product:</strong></p>
+          <ol style="margin:8px 0 16px 20px;">
+            <li>Tap <strong>"+ Add Product"</strong> below</li>
+            <li>Fill in the product name, category, price, and availability</li>
+            <li>Add a description (optional but recommended)</li>
+            <li>Add an image — tap <strong>"📁 Upload Image"</strong> to pick from your gallery, or <strong>"📸 Take Photo"</strong> to use your camera</li>
+            <li>Tap <strong>"Save Product"</strong> — it'll appear on the website instantly</li>
+          </ol>
+          <p><strong>Editing a Product:</strong></p>
+          <ol style="margin:8px 0 16px 20px;">
+            <li>Find the product in the list below</li>
+            <li>Tap <strong>"Edit"</strong> — the form will open with the current details</li>
+            <li>Change whatever you need and tap <strong>"Save Product"</strong></li>
+          </ol>
+          <p><strong>Deleting a Product:</strong></p>
+          <ol style="margin:8px 0 16px 20px;">
+            <li>Find the product and tap <strong>"Delete"</strong></li>
+            <li>Confirm — this cannot be undone</li>
+          </ol>
+          <p><strong>Tips:</strong></p>
+          <ul style="margin:8px 0 0 20px;">
+            <li>Products show on the website <strong>immediately</strong> after saving</li>
+            <li>Use <strong>"Available"</strong> for items you have in stock, <strong>"Preorder"</strong> for items that need to be ordered</li>
+            <li>Include the currency in the price field (e.g. <strong>GH₵ 85</strong>)</li>
+            <li>Keep descriptions short — 1-2 sentences max</li>
+            <li>Tap <strong>"← View Site"</strong> at the top to see how your shop looks to customers</li>
+          </ul>
+        </div>
+      </div>
+      <br>
+
       <!-- Product list -->
       <div class="section-bar">
         <h2>Products</h2>
@@ -332,6 +370,16 @@
   <script>
   (function () {
     'use strict';
+
+    // Instructions toggle
+    var instructionsToggle = document.getElementById('instructionsToggle');
+    var instructionsBody = document.getElementById('instructionsBody');
+    var instructionsArrow = document.getElementById('instructionsArrow');
+    instructionsToggle.addEventListener('click', function () {
+      var open = instructionsBody.style.display === 'none';
+      instructionsBody.style.display = open ? 'block' : 'none';
+      instructionsArrow.style.transform = open ? 'rotate(180deg)' : '';
+    });
 
     // Init Firebase
     firebase.initializeApp(firebaseConfig);
