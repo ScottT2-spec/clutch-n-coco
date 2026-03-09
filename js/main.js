@@ -96,7 +96,7 @@
       var count = products.filter(function (p) { return p.category === cat; }).length;
       var hint = card.querySelector('.card-tap-hint');
       if (hint) {
-        hint.textContent = count > 0 ? 'Tap to view ' + count + ' item' + (count > 1 ? 's' : '') + ' →' : 'Coming soon →';
+        hint.textContent = count > 0 ? 'Tap to view ' + count + ' item' + (count > 1 ? 's' : '') + ' →' : 'Tap to view items →';
       }
     });
   }
@@ -155,7 +155,7 @@
       modalBody.innerHTML =
         '<div class="modal-empty">' +
           '<div class="modal-empty-emoji">🛍️</div>' +
-          '<p>Items coming soon!<br>Message us on WhatsApp for the latest stock.</p>' +
+          '<p>No items yet in this category.<br>Message us on WhatsApp to check availability.</p>' +
         '</div>';
     } else {
       var html = '<div class="item-grid">';
