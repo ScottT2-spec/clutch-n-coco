@@ -595,6 +595,34 @@
       });
     }
 
+    // Compress image and return base64 data URL (fallback when Storage fails)
+    function compressAndEncode(file) {
+      return new Promise(function (resolve, reject) {
+        var reader = new FileReader();
+        reader.onload = function (e) {
+          var img = new Image();
+          img.onload = function () {
+            var canvas = document.createElement('canvas');
+            var maxSize = 800;
+            var w = img.width, h = img.height;
+            if (w > maxSize || h > maxSize) {
+              if (w > h) { h = Math.round(h * maxSize / w); w = maxSize; }
+              else { w = Math.round(w * maxSize / h); h = maxSize; }
+            }
+            canvas.width = w;
+            canvas.height = h;
+            canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+            var dataUrl = canvas.toDataURL('image/jpeg', 0.7);
+            resolve(dataUrl);
+          };
+          img.onerror = function () { reject(new Error('Failed to load image')); };
+          img.src = e.target.result;
+        };
+        reader.onerror = function () { reject(new Error('Failed to read file')); };
+        reader.readAsDataURL(file);
+      });
+    }
+
     // Add product form
     addProductBtn.addEventListener('click', function () {
       formTitle.textContent = 'Add Product';
@@ -640,7 +668,11 @@
       var imagePromise;
       if (selectedImageFile) {
         saveProductBtn.textContent = 'Uploading image...';
-        imagePromise = uploadImage(selectedImageFile);
+        imagePromise = uploadImage(selectedImageFile).catch(function (err) {
+          // Fallback: compress and store as base64 data URL in Firestore
+          saveProductBtn.textContent = 'Compressing image...';
+          return compressAndEncode(selectedImageFile);
+        });
       } else {
         imagePromise = Promise.resolve(existingImage);
       }
