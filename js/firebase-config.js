@@ -10,5 +10,14 @@ var firebaseConfig = {
   appId: "1:498959726356:web:c4aedf4fb77dde7f523401"
 };
 
-// Admin email — only this account can access the admin panel
-var ADMIN_EMAIL = "scottantwi930@gmail.com";
+// Admin emails — these accounts can access the admin panel
+// Add up to 4 admin emails. Leave empty strings as placeholders.
+var ADMIN_EMAILS = [
+  "scottantwi930@gmail.com",
+  "",   // Admin 2 — add email here
+  "",   // Admin 3 — add email here
+  ""    // Admin 4 — add email here
+];
+
+// Legacy single-admin variable (for backward compat)
+var ADMIN_EMAIL = ADMIN_EMAILS[0];

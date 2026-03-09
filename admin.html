@@ -174,6 +174,23 @@
     .image-upload-area.has-image { border-style:solid; border-color:var(--rose); }
     .image-btn-row { display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
 
+    /* Multi-image gallery */
+    .gallery-thumb {
+      position:relative; width:80px; height:80px; border-radius:8px; overflow:hidden;
+      border:2px solid var(--blush); flex-shrink:0;
+    }
+    .gallery-thumb img { width:100%; height:100%; object-fit:cover; }
+    .gallery-thumb .gallery-remove {
+      position:absolute; top:2px; right:2px; width:22px; height:22px;
+      background:#dc3545; color:#fff; border:none; border-radius:50%;
+      font-size:.7rem; cursor:pointer; display:flex; align-items:center; justify-content:center;
+      line-height:1; padding:0;
+    }
+    .gallery-thumb .gallery-main-badge {
+      position:absolute; bottom:2px; left:2px; background:var(--burgundy); color:#fff;
+      font-size:.6rem; padding:1px 5px; border-radius:4px; font-weight:600;
+    }
+
     @media(max-width:600px) {
       .admin-product-card { flex-direction:column; align-items:stretch; text-align:center; }
       .admin-product-thumb { margin:0 auto; }
@@ -318,21 +335,19 @@
         <textarea id="pDesc" placeholder="Short description of the item..."></textarea>
       </div>
       <div class="form-group">
-        <label>Product Image (optional)</label>
+        <label>Product Images (optional — up to 5)</label>
+        <div id="imageGallery" style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:12px;"></div>
         <div class="image-upload-area" id="imageUploadArea">
-          <div class="image-preview" id="imagePreview" style="display:none;">
-            <img id="previewImg" src="" alt="Preview">
-            <button type="button" class="btn btn--danger btn--sm remove-img-btn" id="removeImgBtn">✕</button>
-          </div>
           <div class="image-upload-prompt" id="imageUploadPrompt">
             <div style="font-size:2rem;">🖼️</div>
-            <p style="margin:8px 0 12px; font-weight:500; color:var(--burgundy);">Add Product Image</p>
+            <p style="margin:8px 0 4px; font-weight:500; color:var(--burgundy);">Add Product Images</p>
+            <p style="font-size:.8rem; color:var(--txt-muted); margin-bottom:12px;">Upload up to 5 images. First image is the main thumbnail.</p>
             <div class="image-btn-row">
-              <button type="button" class="btn btn--outline btn--sm" id="uploadGalleryBtn">📁 Upload Image</button>
+              <button type="button" class="btn btn--outline btn--sm" id="uploadGalleryBtn">📁 Upload Images</button>
               <button type="button" class="btn btn--outline btn--sm" id="takePhotoBtn">📸 Take Photo</button>
             </div>
           </div>
-          <input type="file" id="pImageFile" accept="image/png,image/jpeg,image/jpg,image/gif,image/webp" style="display:none;">
+          <input type="file" id="pImageFile" accept="image/png,image/jpeg,image/jpg,image/gif,image/webp" multiple style="display:none;">
           <input type="file" id="pCameraFile" accept="image/*" capture="environment" style="display:none;">
         </div>
         <input type="hidden" id="pImage" value="">
@@ -434,9 +449,19 @@
       setTimeout(function () { toast.classList.remove('show'); }, 3000);
     }
 
+    // Check if email is an allowed admin
+    function isAdmin(email) {
+      if (!email) return false;
+      var lowerEmail = email.toLowerCase();
+      if (typeof ADMIN_EMAILS !== 'undefined') {
+        return ADMIN_EMAILS.some(function(e) { return e && e.toLowerCase() === lowerEmail; });
+      }
+      return lowerEmail === (ADMIN_EMAIL || '').toLowerCase();
+    }
+
     // Auth state
     auth.onAuthStateChanged(function (user) {
-      if (user && user.email === ADMIN_EMAIL) {
+      if (user && isAdmin(user.email)) {
         loginScreen.classList.add('hidden');
         dashboard.classList.add('active');
         adminEmailDisplay.textContent = user.email;
@@ -444,7 +469,7 @@
       } else {
         loginScreen.classList.remove('hidden');
         dashboard.classList.remove('active');
-        if (user && user.email !== ADMIN_EMAIL) {
+        if (user && !isAdmin(user.email)) {
           auth.signOut();
           showLoginError('Access denied. Admin only.');
         }
@@ -509,6 +534,7 @@
         var badgeClass = item.status === 'available' ? 'badge--available' : 'badge--preorder';
         var badgeText = item.status === 'available' ? 'Available' : 'Preorder';
 
+        var imgCount = (item.images && Array.isArray(item.images)) ? item.images.length : (item.image ? 1 : 0);
         var thumb;
         if (item.image) {
           thumb = '<img src="' + item.image + '" alt="' + item.name + '">';
@@ -522,7 +548,7 @@
             '<div class="admin-product-info">' +
               '<div class="admin-product-name">' + item.name + '</div>' +
               '<div class="admin-product-meta">' +
-                catName + ' · ' + item.price + ' · <span class="badge ' + badgeClass + '">' + badgeText + '</span>' +
+                catName + ' · ' + item.price + (imgCount > 1 ? ' · 🖼️' + imgCount : '') + ' · <span class="badge ' + badgeClass + '">' + badgeText + '</span>' +
               '</div>' +
             '</div>' +
             '<div class="admin-product-actions">' +
@@ -542,13 +568,14 @@
       });
     }
 
-    // Image upload handlers
+    // Multi-image upload handlers
+    var MAX_IMAGES = 5;
     var imageUploadArea = document.getElementById('imageUploadArea');
     var imageUploadPrompt = document.getElementById('imageUploadPrompt');
-    var imagePreview = document.getElementById('imagePreview');
-    var previewImg = document.getElementById('previewImg');
+    var imageGallery = document.getElementById('imageGallery');
     var pImageFile = document.getElementById('pImageFile');
-    var removeImgBtn = document.getElementById('removeImgBtn');
+    var selectedImageFiles = [];   // array of File objects (new uploads)
+    var existingImages = [];       // array of URLs (from Firestore when editing)
 
     var uploadGalleryBtn = document.getElementById('uploadGalleryBtn');
     var takePhotoBtn = document.getElementById('takePhotoBtn');
@@ -564,45 +591,95 @@
       pCameraFile.click();
     });
 
-    function handleFileSelected(file) {
-      if (!file) return;
-      selectedImageFile = file;
-      var reader = new FileReader();
-      reader.onload = function (e) {
-        previewImg.src = e.target.result;
-        imagePreview.style.display = 'block';
-        imageUploadPrompt.style.display = 'none';
-        imageUploadArea.classList.add('has-image');
-      };
-      reader.readAsDataURL(file);
+    function totalImageCount() { return existingImages.length + selectedImageFiles.length; }
+
+    function handleFilesSelected(files) {
+      if (!files || !files.length) return;
+      for (var i = 0; i < files.length; i++) {
+        if (totalImageCount() >= MAX_IMAGES) {
+          showToast('Maximum ' + MAX_IMAGES + ' images allowed');
+          break;
+        }
+        selectedImageFiles.push(files[i]);
+      }
+      renderImageGallery();
     }
 
     pImageFile.addEventListener('change', function () {
-      handleFileSelected(pImageFile.files[0]);
+      handleFilesSelected(pImageFile.files);
+      pImageFile.value = '';
     });
 
     pCameraFile.addEventListener('change', function () {
-      handleFileSelected(pCameraFile.files[0]);
+      handleFilesSelected(pCameraFile.files);
+      pCameraFile.value = '';
     });
 
-    removeImgBtn.addEventListener('click', function (e) {
-      e.stopPropagation();
-      selectedImageFile = null;
-      pImageFile.value = '';
-      document.getElementById('pImage').value = '';
-      previewImg.src = '';
-      imagePreview.style.display = 'none';
-      imageUploadPrompt.style.display = '';
-      imageUploadArea.classList.remove('has-image');
-    });
+    function renderImageGallery() {
+      imageGallery.innerHTML = '';
+      var total = totalImageCount();
+
+      // Existing images (URLs)
+      existingImages.forEach(function (url, idx) {
+        var thumb = document.createElement('div');
+        thumb.className = 'gallery-thumb';
+        thumb.innerHTML =
+          '<img src="' + url + '" alt="Image ' + (idx + 1) + '">' +
+          '<button class="gallery-remove" data-type="existing" data-idx="' + idx + '">✕</button>' +
+          (idx === 0 ? '<span class="gallery-main-badge">MAIN</span>' : '');
+        imageGallery.appendChild(thumb);
+      });
+
+      // New files (preview with FileReader)
+      selectedImageFiles.forEach(function (file, idx) {
+        var thumb = document.createElement('div');
+        thumb.className = 'gallery-thumb';
+        var globalIdx = existingImages.length + idx;
+        thumb.innerHTML =
+          '<img src="" alt="New image ' + (idx + 1) + '">' +
+          '<button class="gallery-remove" data-type="new" data-idx="' + idx + '">✕</button>' +
+          (globalIdx === 0 ? '<span class="gallery-main-badge">MAIN</span>' : '');
+        imageGallery.appendChild(thumb);
+
+        var reader = new FileReader();
+        reader.onload = function (e) { thumb.querySelector('img').src = e.target.result; };
+        reader.readAsDataURL(file);
+      });
+
+      // Remove button handlers
+      imageGallery.querySelectorAll('.gallery-remove').forEach(function (btn) {
+        btn.addEventListener('click', function (e) {
+          e.stopPropagation();
+          var type = btn.getAttribute('data-type');
+          var i = parseInt(btn.getAttribute('data-idx'));
+          if (type === 'existing') { existingImages.splice(i, 1); }
+          else { selectedImageFiles.splice(i, 1); }
+          renderImageGallery();
+        });
+      });
+
+      // Update upload area visibility
+      if (total >= MAX_IMAGES) {
+        imageUploadArea.style.display = 'none';
+      } else {
+        imageUploadArea.style.display = '';
+      }
+
+      if (total > 0) {
+        imageUploadArea.classList.add('has-image');
+      } else {
+        imageUploadArea.classList.remove('has-image');
+      }
+    }
 
     function resetImageUpload() {
-      selectedImageFile = null;
+      selectedImageFiles = [];
+      existingImages = [];
       pImageFile.value = '';
       pCameraFile.value = '';
-      previewImg.src = '';
-      imagePreview.style.display = 'none';
-      imageUploadPrompt.style.display = '';
+      document.getElementById('pImage').value = '';
+      imageGallery.innerHTML = '';
+      imageUploadArea.style.display = '';
       imageUploadArea.classList.remove('has-image');
     }
 
@@ -701,8 +778,6 @@
       var price = document.getElementById('pPrice').value.trim();
       var status = document.getElementById('pStatus').value;
       var desc = document.getElementById('pDesc').value.trim();
-      var existingImage = document.getElementById('pImage').value.trim();
-
       if (!name || !category || !price) {
         formError.textContent = 'Name, category, and price are required.';
         formError.style.display = 'block';
@@ -712,19 +787,23 @@
       saveProductBtn.disabled = true;
       saveProductBtn.textContent = 'Saving...';
 
-      // Compress and store image directly (no Firebase Storage needed)
-      var imagePromise;
-      if (selectedImageFile) {
-        saveProductBtn.textContent = 'Processing image...';
-        imagePromise = compressAndEncode(selectedImageFile);
-      } else {
-        imagePromise = Promise.resolve(existingImage);
-      }
+      // Process all new image files
+      var imagePromises = selectedImageFiles.map(function (file, idx) {
+        saveProductBtn.textContent = 'Processing image ' + (idx + 1) + '/' + selectedImageFiles.length + '...';
+        return compressAndEncode(file);
+      });
 
-      imagePromise.then(function (imageUrl) {
+      Promise.all(imagePromises).then(function (newImageUrls) {
+        // Combine existing + new images
+        var allImages = existingImages.concat(newImageUrls);
+        // First image is the main thumbnail (backward compat)
+        var mainImage = allImages.length > 0 ? allImages[0] : '';
+
         var data = {
           name: name, category: category, price: price,
-          status: status, description: desc, image: imageUrl || '',
+          status: status, description: desc,
+          image: mainImage,          // backward compat — main thumbnail
+          images: allImages,          // all product images
           updatedAt: firebase.firestore.FieldValue.serverTimestamp()
         };
 
@@ -766,13 +845,13 @@
         document.getElementById('pDesc').value = d.description || '';
         document.getElementById('pImage').value = d.image || '';
         resetImageUpload();
-        // Show existing image in preview if available
-        if (d.image) {
-          previewImg.src = d.image;
-          imagePreview.style.display = 'block';
-          imageUploadPrompt.style.display = 'none';
-          imageUploadArea.classList.add('has-image');
+        // Load existing images (support both old single-image and new multi-image)
+        if (d.images && Array.isArray(d.images) && d.images.length > 0) {
+          existingImages = d.images.slice();
+        } else if (d.image) {
+          existingImages = [d.image];
         }
+        renderImageGallery();
         openForm();
       });
     }
