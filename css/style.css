@@ -422,11 +422,10 @@ strong { font-weight:600; }
 }
 @media(max-width:480px){ .brand-logo { height:40px; } }
 
-/* Hero logo */
-.hero-logo {
-  display:block; margin:0 auto 16px; height:auto; width:min(320px, 70vw);
-  border-radius:8px;
-}
+/* Hero swoosh before title */
+.hero-title { display:inline-flex; align-items:center; gap:4px; }
+.hero-swoosh { width:36px; height:auto; flex-shrink:0; margin-right:2px; }
+@media(max-width:480px){ .hero-swoosh { width:28px; } }
 
 /* Wide card for "Other Items" spanning full row */
 .product-card--wide { grid-column: 1 / -1; }
