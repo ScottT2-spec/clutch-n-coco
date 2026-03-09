@@ -172,6 +172,7 @@
       padding:0; border-radius:50%; font-size:.8rem; line-height:1;
     }
     .image-upload-area.has-image { border-style:solid; border-color:var(--rose); }
+    .image-btn-row { display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
 
     @media(max-width:600px) {
       .admin-product-card { flex-direction:column; align-items:stretch; text-align:center; }
@@ -286,11 +287,15 @@
             <button type="button" class="btn btn--danger btn--sm remove-img-btn" id="removeImgBtn">✕</button>
           </div>
           <div class="image-upload-prompt" id="imageUploadPrompt">
-            <div style="font-size:2rem;">📸</div>
-            <p style="margin:8px 0 4px; font-weight:500; color:var(--burgundy);">Upload Image or Take Photo</p>
-            <p style="font-size:.8rem; color:var(--txt-muted);">Tap to choose from gallery or camera</p>
+            <div style="font-size:2rem;">🖼️</div>
+            <p style="margin:8px 0 12px; font-weight:500; color:var(--burgundy);">Add Product Image</p>
+            <div class="image-btn-row">
+              <button type="button" class="btn btn--outline btn--sm" id="uploadGalleryBtn">📁 Upload Image</button>
+              <button type="button" class="btn btn--outline btn--sm" id="takePhotoBtn">📸 Take Photo</button>
+            </div>
           </div>
           <input type="file" id="pImageFile" accept="image/*" style="display:none;">
+          <input type="file" id="pCameraFile" accept="image/*" capture="environment" style="display:none;">
         </div>
         <input type="hidden" id="pImage" value="">
       </div>
@@ -497,13 +502,21 @@
     var pImageFile = document.getElementById('pImageFile');
     var removeImgBtn = document.getElementById('removeImgBtn');
 
-    imageUploadArea.addEventListener('click', function (e) {
-      if (e.target === removeImgBtn || removeImgBtn.contains(e.target)) return;
+    var uploadGalleryBtn = document.getElementById('uploadGalleryBtn');
+    var takePhotoBtn = document.getElementById('takePhotoBtn');
+    var pCameraFile = document.getElementById('pCameraFile');
+
+    uploadGalleryBtn.addEventListener('click', function (e) {
+      e.stopPropagation();
       pImageFile.click();
     });
 
-    pImageFile.addEventListener('change', function () {
-      var file = pImageFile.files[0];
+    takePhotoBtn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      pCameraFile.click();
+    });
+
+    function handleFileSelected(file) {
       if (!file) return;
       selectedImageFile = file;
       var reader = new FileReader();
@@ -514,6 +527,14 @@
         imageUploadArea.classList.add('has-image');
       };
       reader.readAsDataURL(file);
+    }
+
+    pImageFile.addEventListener('change', function () {
+      handleFileSelected(pImageFile.files[0]);
+    });
+
+    pCameraFile.addEventListener('change', function () {
+      handleFileSelected(pCameraFile.files[0]);
     });
 
     removeImgBtn.addEventListener('click', function (e) {
@@ -530,6 +551,7 @@
     function resetImageUpload() {
       selectedImageFile = null;
       pImageFile.value = '';
+      pCameraFile.value = '';
       previewImg.src = '';
       imagePreview.style.display = 'none';
       imageUploadPrompt.style.display = '';
