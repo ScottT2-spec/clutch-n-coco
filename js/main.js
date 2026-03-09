@@ -1,6 +1,7 @@
 /**
  * Clutch 'N' Coco — Main script
- * Vanilla JS, no dependencies.
+ * Reads products from Firebase Firestore (admin-managed).
+ * Falls back to products.json if Firebase is not configured.
  */
 (function () {
   'use strict';
@@ -28,7 +29,6 @@
     toggle.setAttribute('aria-expanded', open);
   });
 
-  // Close on link tap
   nav.querySelectorAll('.nav-link').forEach(function (link) {
     link.addEventListener('click', function () {
       nav.classList.remove('open');
@@ -77,7 +77,6 @@
   var modalBody = document.getElementById('modalBody');
   var modalClose = document.getElementById('modalClose');
 
-  // Category display names & emoji
   var categoryMeta = {
     'dresses-tops':      { name: 'Dresses & Tops',      emoji: '👗' },
     'jewelry-bracelets': { name: 'Jewelry & Bracelets',  emoji: '💍' },
@@ -89,11 +88,60 @@
     'chains-earrings':   { name: 'Chains & Earrings',      emoji: '🔗' }
   };
 
-  // Load products.json
-  fetch('products.json')
-    .then(function (res) { return res.json(); })
-    .then(function (data) { products = data; })
-    .catch(function () { products = []; });
+  // Update category card item counts
+  function updateCategoryCounts() {
+    document.querySelectorAll('.product-card--clickable').forEach(function (card) {
+      var cat = card.getAttribute('data-category');
+      var count = products.filter(function (p) { return p.category === cat; }).length;
+      var hint = card.querySelector('.card-tap-hint');
+      if (hint) {
+        hint.textContent = count > 0 ? 'Tap to view ' + count + ' item' + (count > 1 ? 's' : '') + ' →' : 'Coming soon →';
+      }
+    });
+  }
+
+  // Try loading from Firestore first
+  function loadFromFirestore() {
+    if (typeof firebase === 'undefined' || typeof firebaseConfig === 'undefined' ||
+        firebaseConfig.apiKey === 'YOUR_API_KEY') {
+      // Firebase not configured — fall back to JSON
+      loadFromJSON();
+      return;
+    }
+
+    try {
+      if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+      var db = firebase.firestore();
+
+      db.collection('products').orderBy('createdAt', 'desc').onSnapshot(
+        function (snap) {
+          products = [];
+          snap.forEach(function (doc) {
+            products.push(Object.assign({ id: doc.id }, doc.data()));
+          });
+          updateCategoryCounts();
+        },
+        function () {
+          // Firestore error — fall back to JSON
+          loadFromJSON();
+        }
+      );
+    } catch (e) {
+      loadFromJSON();
+    }
+  }
+
+  function loadFromJSON() {
+    fetch('products.json')
+      .then(function (res) { return res.json(); })
+      .then(function (data) {
+        products = data;
+        updateCategoryCounts();
+      })
+      .catch(function () { products = []; });
+  }
+
+  loadFromFirestore();
 
   // Open modal for a category
   function openModal(category) {
