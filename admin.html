@@ -158,6 +158,21 @@
     }
     .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
 
+    /* Image upload */
+    .image-upload-area {
+      border:2px dashed var(--blush); border-radius:var(--r-sm); padding:24px;
+      text-align:center; cursor:pointer; transition:border-color .2s, background .2s;
+      position:relative;
+    }
+    .image-upload-area:hover { border-color:var(--rose); background:var(--blush-light); }
+    .image-preview { position:relative; display:inline-block; }
+    .image-preview img { max-width:100%; max-height:200px; border-radius:8px; object-fit:cover; }
+    .remove-img-btn {
+      position:absolute; top:6px; right:6px; width:28px; height:28px;
+      padding:0; border-radius:50%; font-size:.8rem; line-height:1;
+    }
+    .image-upload-area.has-image { border-style:solid; border-color:var(--rose); }
+
     @media(max-width:600px) {
       .admin-product-card { flex-direction:column; align-items:stretch; text-align:center; }
       .admin-product-thumb { margin:0 auto; }
@@ -264,8 +279,20 @@
         <textarea id="pDesc" placeholder="Short description of the item..."></textarea>
       </div>
       <div class="form-group">
-        <label for="pImage">Image URL (optional)</label>
-        <input type="url" id="pImage" placeholder="https://example.com/photo.jpg">
+        <label>Product Image (optional)</label>
+        <div class="image-upload-area" id="imageUploadArea">
+          <div class="image-preview" id="imagePreview" style="display:none;">
+            <img id="previewImg" src="" alt="Preview">
+            <button type="button" class="btn btn--danger btn--sm remove-img-btn" id="removeImgBtn">✕</button>
+          </div>
+          <div class="image-upload-prompt" id="imageUploadPrompt">
+            <div style="font-size:2rem;">📸</div>
+            <p style="margin:8px 0 4px; font-weight:500; color:var(--burgundy);">Upload Image or Take Photo</p>
+            <p style="font-size:.8rem; color:var(--txt-muted);">Tap to choose from gallery or camera</p>
+          </div>
+          <input type="file" id="pImageFile" accept="image/*" capture="environment" style="display:none;">
+        </div>
+        <input type="hidden" id="pImage" value="">
       </div>
       <div id="formError" class="error-msg" style="display:none;"></div>
       <div class="form-actions">
@@ -295,6 +322,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage-compat.js"></script>
   <script src="js/firebase-config.js"></script>
   <script>
   (function () {
@@ -304,6 +332,8 @@
     firebase.initializeApp(firebaseConfig);
     var auth = firebase.auth();
     var db = firebase.firestore();
+    var storage = firebase.storage();
+    var selectedImageFile = null;
 
     // DOM refs
     var loginScreen = document.getElementById('loginScreen');
@@ -459,6 +489,62 @@
       });
     }
 
+    // Image upload handlers
+    var imageUploadArea = document.getElementById('imageUploadArea');
+    var imageUploadPrompt = document.getElementById('imageUploadPrompt');
+    var imagePreview = document.getElementById('imagePreview');
+    var previewImg = document.getElementById('previewImg');
+    var pImageFile = document.getElementById('pImageFile');
+    var removeImgBtn = document.getElementById('removeImgBtn');
+
+    imageUploadArea.addEventListener('click', function (e) {
+      if (e.target === removeImgBtn || removeImgBtn.contains(e.target)) return;
+      pImageFile.click();
+    });
+
+    pImageFile.addEventListener('change', function () {
+      var file = pImageFile.files[0];
+      if (!file) return;
+      selectedImageFile = file;
+      var reader = new FileReader();
+      reader.onload = function (e) {
+        previewImg.src = e.target.result;
+        imagePreview.style.display = 'block';
+        imageUploadPrompt.style.display = 'none';
+        imageUploadArea.classList.add('has-image');
+      };
+      reader.readAsDataURL(file);
+    });
+
+    removeImgBtn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      selectedImageFile = null;
+      pImageFile.value = '';
+      document.getElementById('pImage').value = '';
+      previewImg.src = '';
+      imagePreview.style.display = 'none';
+      imageUploadPrompt.style.display = '';
+      imageUploadArea.classList.remove('has-image');
+    });
+
+    function resetImageUpload() {
+      selectedImageFile = null;
+      pImageFile.value = '';
+      previewImg.src = '';
+      imagePreview.style.display = 'none';
+      imageUploadPrompt.style.display = '';
+      imageUploadArea.classList.remove('has-image');
+    }
+
+    function uploadImage(file) {
+      var ext = file.name.split('.').pop() || 'jpg';
+      var path = 'product-images/' + Date.now() + '-' + Math.random().toString(36).substr(2, 8) + '.' + ext;
+      var ref = storage.ref(path);
+      return ref.put(file).then(function () {
+        return ref.getDownloadURL();
+      });
+    }
+
     // Add product form
     addProductBtn.addEventListener('click', function () {
       formTitle.textContent = 'Add Product';
@@ -479,6 +565,7 @@
       document.getElementById('pStatus').value = 'available';
       document.getElementById('pDesc').value = '';
       document.getElementById('pImage').value = '';
+      resetImageUpload();
     }
 
     // Save
@@ -488,7 +575,7 @@
       var price = document.getElementById('pPrice').value.trim();
       var status = document.getElementById('pStatus').value;
       var desc = document.getElementById('pDesc').value.trim();
-      var image = document.getElementById('pImage').value.trim();
+      var existingImage = document.getElementById('pImage').value.trim();
 
       if (!name || !category || !price) {
         formError.textContent = 'Name, category, and price are required.';
@@ -496,27 +583,40 @@
         return;
       }
 
-      var data = {
-        name: name, category: category, price: price,
-        status: status, description: desc, image: image,
-        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-      };
-
       saveProductBtn.disabled = true;
       saveProductBtn.textContent = 'Saving...';
 
-      var id = editId.value;
-      var promise;
-      if (id) {
-        promise = db.collection('products').doc(id).update(data);
+      // Upload image first if a new file was selected
+      var imagePromise;
+      if (selectedImageFile) {
+        saveProductBtn.textContent = 'Uploading image...';
+        imagePromise = uploadImage(selectedImageFile);
       } else {
-        data.createdAt = firebase.firestore.FieldValue.serverTimestamp();
-        promise = db.collection('products').add(data);
+        imagePromise = Promise.resolve(existingImage);
       }
 
-      promise.then(function () {
-        showToast(id ? 'Product updated ✅' : 'Product added ✅');
-        closeForm();
+      imagePromise.then(function (imageUrl) {
+        var data = {
+          name: name, category: category, price: price,
+          status: status, description: desc, image: imageUrl || '',
+          updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        };
+
+        saveProductBtn.textContent = 'Saving...';
+
+        var id = editId.value;
+        var promise;
+        if (id) {
+          promise = db.collection('products').doc(id).update(data);
+        } else {
+          data.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+          promise = db.collection('products').add(data);
+        }
+
+        return promise.then(function () {
+          showToast(id ? 'Product updated ✅' : 'Product added ✅');
+          closeForm();
+        });
       }).catch(function (err) {
         formError.textContent = err.message;
         formError.style.display = 'block';
@@ -539,6 +639,14 @@
         document.getElementById('pStatus').value = d.status || 'available';
         document.getElementById('pDesc').value = d.description || '';
         document.getElementById('pImage').value = d.image || '';
+        resetImageUpload();
+        // Show existing image in preview if available
+        if (d.image) {
+          previewImg.src = d.image;
+          imagePreview.style.display = 'block';
+          imageUploadPrompt.style.display = 'none';
+          imageUploadArea.classList.add('has-image');
+        }
         openForm();
       });
     }
