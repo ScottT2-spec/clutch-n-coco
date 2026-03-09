@@ -14,8 +14,8 @@ var firebaseConfig = {
 // Add up to 4 admin emails. Leave empty strings as placeholders.
 var ADMIN_EMAILS = [
   "scottantwi930@gmail.com",
-  "",   // Admin 2 — add email here
-  "",   // Admin 3 — add email here
+  "brownskinako@gmail.com",
+  "yaaasieduaaddae17@gmail.com",
   ""    // Admin 4 — add email here
 ];
 
