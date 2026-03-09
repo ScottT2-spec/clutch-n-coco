@@ -85,7 +85,8 @@
     'shoes':             { name: 'Shoes',                  emoji: '👠' },
     'gift-sets':         { name: 'Gift Sets',              emoji: '🎁' },
     'watches-wallets':   { name: 'Watches & Wallets',      emoji: '⌚' },
-    'chains-earrings':   { name: 'Chains & Earrings',      emoji: '🔗' }
+    'chains-earrings':   { name: 'Chains & Earrings',      emoji: '🔗' },
+    'other':             { name: 'Other Items',              emoji: '🛍️' }
   };
 
   // Update category card item counts
