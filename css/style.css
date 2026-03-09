@@ -530,3 +530,47 @@ strong { font-weight:600; }
   .modal-header { padding:16px 18px; }
   .modal-body { padding:16px 18px; }
 }
+
+/* ==========================================================================
+   Fullscreen Image Lightbox
+   ========================================================================== */
+.lightbox-overlay {
+  position:fixed; inset:0; z-index:9999;
+  background:rgba(0,0,0,.92); backdrop-filter:blur(8px);
+  display:flex; align-items:center; justify-content:center;
+  opacity:0; pointer-events:none; transition:opacity .3s ease;
+}
+.lightbox-overlay.active { opacity:1; pointer-events:auto; }
+
+.lightbox-content {
+  position:relative; display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  width:100%; height:100%; padding:20px;
+}
+
+.lightbox-close {
+  position:absolute; top:16px; right:16px; z-index:10;
+  width:44px; height:44px; border-radius:50%;
+  background:rgba(255,255,255,.15); border:none;
+  color:#fff; font-size:1.8rem; line-height:1;
+  cursor:pointer; transition:background .2s;
+  display:flex; align-items:center; justify-content:center;
+}
+.lightbox-close:hover { background:rgba(255,255,255,.3); }
+
+.lightbox-img {
+  max-width:92vw; max-height:80vh; object-fit:contain;
+  border-radius:8px; box-shadow:0 8px 40px rgba(0,0,0,.5);
+  transform:scale(.9); transition:transform .3s ease;
+}
+.lightbox-overlay.active .lightbox-img { transform:scale(1); }
+
+.lightbox-caption {
+  color:rgba(255,255,255,.8); font-size:.9rem; margin-top:14px;
+  text-align:center; font-family:'Inter',system-ui,sans-serif;
+}
+
+/* Make clickable images show pointer */
+.item-image--clickable { cursor:pointer; transition:transform .2s, box-shadow .2s; }
+.item-image--clickable:hover { transform:scale(1.03); box-shadow:0 4px 16px rgba(0,0,0,.15); }
+.item-image--clickable:active { transform:scale(0.98); }

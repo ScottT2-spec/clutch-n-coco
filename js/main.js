@@ -165,7 +165,7 @@
 
         var imageHtml;
         if (item.image) {
-          imageHtml = '<img class="item-image" src="' + item.image + '" alt="' + item.name + '" loading="lazy">';
+          imageHtml = '<img class="item-image item-image--clickable" src="' + item.image + '" alt="' + item.name + '" loading="lazy" data-full="' + item.image + '">';
         } else {
           imageHtml = '<div class="item-image-placeholder">' + meta.emoji + '</div>';
         }
@@ -186,6 +186,14 @@
       html += '</div>';
       modalBody.innerHTML = html;
     }
+
+    // Attach click handlers to product images for fullscreen view
+    modalBody.querySelectorAll('.item-image--clickable').forEach(function (img) {
+      img.addEventListener('click', function (e) {
+        e.stopPropagation();
+        openLightbox(img.getAttribute('data-full'), img.alt);
+      });
+    });
 
     modal.classList.add('active');
     modal.setAttribute('aria-hidden', 'false');
@@ -220,7 +228,54 @@
     if (e.target === modal) closeModal();
   });
   document.addEventListener('keydown', function (e) {
-    if (e.key === 'Escape' && modal.classList.contains('active')) closeModal();
+    if (e.key === 'Escape') {
+      if (lightbox && lightbox.classList.contains('active')) {
+        closeLightbox();
+      } else if (modal.classList.contains('active')) {
+        closeModal();
+      }
+    }
+  });
+
+  /* ------------------------------------------------------------------
+     Fullscreen image lightbox
+     ------------------------------------------------------------------ */
+  // Create lightbox elements
+  var lightbox = document.createElement('div');
+  lightbox.className = 'lightbox-overlay';
+  lightbox.innerHTML =
+    '<div class="lightbox-content">' +
+      '<button class="lightbox-close" aria-label="Close">&times;</button>' +
+      '<img class="lightbox-img" src="" alt="">' +
+      '<div class="lightbox-caption"></div>' +
+    '</div>';
+  document.body.appendChild(lightbox);
+
+  var lightboxImg = lightbox.querySelector('.lightbox-img');
+  var lightboxCaption = lightbox.querySelector('.lightbox-caption');
+  var lightboxClose = lightbox.querySelector('.lightbox-close');
+
+  function openLightbox(src, alt) {
+    lightboxImg.src = src;
+    lightboxImg.alt = alt || '';
+    lightboxCaption.textContent = alt || '';
+    lightbox.classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeLightbox() {
+    lightbox.classList.remove('active');
+    // Only restore scroll if product modal isn't open
+    if (!modal.classList.contains('active')) {
+      document.body.style.overflow = '';
+    }
+  }
+
+  lightboxClose.addEventListener('click', closeLightbox);
+  lightbox.addEventListener('click', function (e) {
+    if (e.target === lightbox || e.target === lightbox.querySelector('.lightbox-content')) {
+      closeLightbox();
+    }
   });
 
 })();
