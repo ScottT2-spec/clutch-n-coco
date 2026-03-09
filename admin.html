@@ -562,8 +562,36 @@
       var ext = file.name.split('.').pop() || 'jpg';
       var path = 'product-images/' + Date.now() + '-' + Math.random().toString(36).substr(2, 8) + '.' + ext;
       var ref = storage.ref(path);
-      return ref.put(file).then(function () {
-        return ref.getDownloadURL();
+      var uploadTask = ref.put(file);
+
+      return new Promise(function (resolve, reject) {
+        // Timeout after 30 seconds
+        var timeout = setTimeout(function () {
+          uploadTask.cancel();
+          reject(new Error('Upload timed out. Check your Firebase Storage rules — authenticated users need write access to /product-images/.'));
+        }, 30000);
+
+        uploadTask.on('state_changed',
+          function (snapshot) {
+            // Progress
+            var pct = Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
+            saveProductBtn.textContent = 'Uploading ' + pct + '%...';
+          },
+          function (error) {
+            clearTimeout(timeout);
+            if (error.code === 'storage/unauthorized') {
+              reject(new Error('Permission denied. Go to Firebase Console → Storage → Rules and allow authenticated writes to /product-images/.'));
+            } else if (error.code === 'storage/canceled') {
+              reject(new Error('Upload was cancelled.'));
+            } else {
+              reject(error);
+            }
+          },
+          function () {
+            clearTimeout(timeout);
+            uploadTask.snapshot.ref.getDownloadURL().then(resolve).catch(reject);
+          }
+        );
       });
     }
 
