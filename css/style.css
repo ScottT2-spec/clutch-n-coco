@@ -1,4 +1,4 @@
-/* ==========================================================================
+/*
    Clutch 'N' Coco — Stylesheet
    Stack: Vanilla CSS with custom properties, modern layout (Grid/Flexbox),
           scroll-driven animations, no framework dependencies.
@@ -531,7 +531,7 @@ strong { font-weight:600; }
   .modal-body { padding:16px 18px; }
 }
 
-/* ==========================================================================
+/*
    Fullscreen Image Lightbox
    ========================================================================== */
 .lightbox-overlay {
